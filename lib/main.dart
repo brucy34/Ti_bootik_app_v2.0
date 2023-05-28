@@ -10,7 +10,10 @@ import 'package:ti_bootik_app_vtwo/models/category.dart';
 import 'package:ti_bootik_app_vtwo/models/product.dart';
 import 'package:ti_bootik_app_vtwo/models/user.dart';
 import 'package:ti_bootik_app_vtwo/screens/payment.dart';
-import 'package:ti_bootik_app_vtwo/screens/products.dart';
+import 'package:ti_bootik_app_vtwo/screens/allproducts.dart';
+import 'package:ti_bootik_app_vtwo/screens/allCategories.dart';
+import 'package:ti_bootik_app_vtwo/screens/infoProducts.dart';
+import 'package:ti_bootik_app_vtwo/screens/productsByCategory.dart';
 
 void main() {
   runApp(HomePage());
@@ -104,7 +107,7 @@ class _HomePageState extends State<HomePage1> {
         join(path, dbname),
         onCreate: (database, version) async {
           await database.execute(
-              "CREATE TABLE ${mail?.substring(0, mail?.indexOf(
+              "CREATE TABLE IF NOT EXISTS ${mail?.substring(0, mail?.indexOf(
                   '@'))}products (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, price INTEGER, category TEXT,description TEXT,image TEXT )");
         },
         version: 1,
@@ -218,10 +221,10 @@ class _HomePageState extends State<HomePage1> {
                 decoration: BoxDecoration(color: Colors.greenAccent),),
               ListTile(title:Text(myUser1.name,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 30))),
               SizedBox(height: 30.0,),
-              ListTile(title:Text("All categories"),onTap:(){Navigator.push(context, MaterialPageRoute(builder:(_){return allCategories(myList: _categories,mylist: _products,);}
+              ListTile(title:Text("All categories"),onTap:(){Navigator.push(context, MaterialPageRoute(builder:(_){return allCategories(myList: _categories,mylist: _products,dbname1: dbname1,dbname2: dbname2,);}
               )
               );} ,),
-              ListTile(title:Text("All products"),onTap:(){Navigator.push(context, MaterialPageRoute(builder:(_){return allProducts(myList: _products);}
+              ListTile(title:Text("All products"),onTap:(){Navigator.push(context, MaterialPageRoute(builder:(_){return allProducts(myList: _products,dbname1: dbname1,dbname2: dbname2,);}
               )
               );} ,),
               ListTile(title:Text("Pay"),onTap:(){
@@ -229,8 +232,12 @@ class _HomePageState extends State<HomePage1> {
                 )
                 );
               } ,),
-              ListTile(title:Text("Log out"),onTap:(){
+              ListTile(title:Text("Log in"),onTap:(){
                 Navigator.push(context, MaterialPageRoute(builder:(_){return LoginPage();}));
+              } ,),
+              ListTile(title:Text("Log out"),onTap:(){
+                mail=null;
+                Navigator.push(context, MaterialPageRoute(builder:(_){return HomePage1();}));
               } ,),
             ]
         ),
@@ -276,6 +283,11 @@ class data1 extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     if (response != null && mail != null) {
+      if(response!.isEmpty)
+        return Center(
+          child: Text("No products to display now"),
+        );
+      else
       return GridView.count(
         crossAxisCount: 2,
         children: response!.map(
@@ -366,10 +378,11 @@ class data1 extends StatelessWidget{
       );
     }
     else{
-    return Center(
-    child: Text("Nothing to display"),
-    );
-  }
+      return Center(
+        child: Text("Nothing to display"),
+      );
+    }
+
 }
 }
 
@@ -501,7 +514,7 @@ class dataPage extends State<data2> {
                     mail: mail)
                     .deleteProd(
                     product.id,
-                    dbname1),
+                    dbname2),
                 builder: (context,
                     AsyncSnapshot<void> snapshot) {
                   if (snapshot
@@ -561,7 +574,7 @@ class dataPage extends State<data2> {
                           Navigator.push(context, MaterialPageRoute(builder: (
                               _) {
                             return productsByCategory(
-                              myList: prod!, idCategory: category.name,);
+                              myList: prod!, idCategory: category.name,dbname1: dbname1,dbname2: dbname2,);
                           }
                           )
                           );
@@ -699,6 +712,11 @@ class data3 extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     if(response != null && mail != null) {
+      if(response!.isEmpty)
+        return Center(
+          child: Text("No products to display now"),
+        );
+      else
       return GridView.count(
         crossAxisCount: 2,
         children: response!.map(
