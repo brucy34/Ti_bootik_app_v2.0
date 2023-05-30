@@ -274,11 +274,19 @@ class _HomePageState extends State<HomePage1> {
 }
 
 
-class data1 extends StatelessWidget{
+class data1 extends StatefulWidget {
   List<Product>? response;
   String? mail;
   String dbname;
-  data1({super.key,this.response,this.mail,required this.dbname});
+  data1({this.response,this.mail,required this.dbname});
+  @override
+  data1Page createState() => data1Page(response: response,mail: mail,dbname:dbname);
+}
+class data1Page extends State<data1>{
+  List<Product>? response;
+  String? mail;
+  String dbname;
+  data1Page({this.response,this.mail,required this.dbname});
 
   @override
   Widget build(BuildContext context) {
@@ -333,6 +341,10 @@ class data1 extends StatelessWidget{
                                   // semanticLabel: 'Text to announce in accessibility modes',
                                 ),
                                 onPressed: () {
+                                  setState(() {
+                                    _HomePageState(mail: mail).prodList(dbname).then((value) => response=value);
+                                    data1Page(response: response,mail: mail,dbname: dbname);
+                                  });
                                   ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(content: FutureBuilder(
                                         future: _HomePageState(mail: mail)
